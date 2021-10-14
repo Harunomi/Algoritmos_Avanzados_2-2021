@@ -15,14 +15,22 @@ typedef struct estadoStruct{
     int idAnterior;
     int filaActual;
     int *recorrido;
+    int lenRecorrido;
     int pActual;
     int maximoActual;
     // agregar mas
-}estado;
+}Estado;
+
+int aux; // variable global
 
 archivo leerArchivo(char nombreArchivo[30]);
 
 void buscarSolucion(archivo a);
+
+
+Estado *eliminarEstado(Estado *abiertos, int *size);
+
+Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar);
 
 
 int main(){
@@ -64,40 +72,54 @@ archivo leerArchivo(char nombreArchivo[30]){
 
 
 void buscarSolucion(archivo a){
-    int pActual;
-    int maximo = 0;
-    int i = 0;
-    int j = 0;
-    int maximoActual;
-    printf("     %d\n",a.pMax);
-    while (i <=a.nFilas){
-        // reiniciamos los valores de las variables
-        maximoActual = 0;
-        pActual = 0;
-        j = i;
-        // valores de i = 7
-        while(pActual < a.pMax){
-            //valores j = 7,
-            if(j>a.nFilas+1){
-                j = 0;
-            }
-            pActual = pActual + a.matriz[j][1];
-            if (pActual>a.pMax){
-                break;
-            }
-            maximoActual = maximoActual + a.matriz[j][0];
-            if (maximoActual >= maximo){
-                maximo = maximoActual;
-                printf("valor de i: %d\n",i);
-                printf("maximo = %d\n",maximo);
-
-            }
-            j = j + 1;
-            
-            
-        }
-        i++; // avanzamos al siguiente numero
-    }
-    printf("El valor obtenido es: %d",maximo);
+    int *recorridoAux = (int*)malloc(sizeof(int)*0);
+    int canAbiertos = 0; 
+	int canCerrados = 0;
+    Estado * abiertos = (Estado*)malloc(sizeof(Estado)*canAbiertos);
+	Estado * cerrados = (Estado*)malloc(sizeof(Estado)*canCerrados);
 }
 
+int *append(int *entrada,int lenRecorrido,int valorAgregar ){
+    int * listaNueva = (int*)malloc(sizeof(int)*(lenRecorrido+1));
+    for (int i = 0; i < lenRecorrido; i++){
+        listaNueva[i] = entrada[i];
+    }
+    listaNueva[lenRecorrido+1] = valorAgregar;
+    return listaNueva;
+    
+}
+
+Estado crearEstado(int filaActual,int *recorrido,int lenRecorrido,int pActual,int maximoActual,int id){
+    Estado nuevoEstado;
+    nuevoEstado.filaActual = filaActual;
+    int *recorridoNuevo = append(recorrido,lenRecorrido,filaActual);
+    nuevoEstado.recorrido = recorridoNuevo;
+    nuevoEstado.pActual = pActual;
+    nuevoEstado.maximoActual = maximoActual;
+    nuevoEstado.lenRecorrido = lenRecorrido+1;
+    nuevoEstado.id = aux;
+    nuevoEstado.idAnterior = id;
+    return nuevoEstado;
+
+}
+
+Estado *eliminarEstado(Estado *abiertos, int *size){
+	Estado * listaNueva = (Estado*)malloc(sizeof(Estado)*(*size-1));
+	for (int i = 1; i < *size; ++i){
+		listaNueva[i-1] = abiertos[i];
+	}
+	*size = *size - 1;
+	free(abiertos);
+	return listaNueva;
+}
+
+Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar){
+	Estado * listaNueva = (Estado*)malloc(sizeof(Estado)*(*size+1));
+	for (int i = 0; i < *size; ++i){
+		listaNueva[i] = abiertos[i];
+	}
+	listaNueva[*size] = paraAgregar;
+	*size = *size + 1;
+	free(abiertos);
+	return listaNueva;
+}
