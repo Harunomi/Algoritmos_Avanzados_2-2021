@@ -27,16 +27,25 @@ archivo leerArchivo(char nombreArchivo[30]);
 
 void buscarSolucion(archivo a);
 
+int *append(int *entrada,int lenRecorrido,int valorAgregar );
+
+int estadoCorte(Estado entrada,int pMax);
+
+int verificarRecorrido(int *recorrido,int lenRecorrido,int valor);
+
+Estado crearEstado(int filaActual,int *recorrido,int lenRecorrido,int pActual,int maximoActual,int id);
 
 Estado *eliminarEstado(Estado *abiertos, int *size);
 
 Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar);
 
+void mostrarEstados(Estado * cerrados, int canCerrados);
 
 int main(){
-    char nombreArchivo[30];
+    char nombreArchivo[30] = "knapPI_1_10_269.txt";
     printf("Ingrese el nombre del archivo a leer (con su respectiva extension)\n");
-    scanf("%s",nombreArchivo);
+    //scanf("%s",nombreArchivo);
+
     archivo a = leerArchivo(nombreArchivo);
     buscarSolucion(a);
     return 0;
@@ -75,8 +84,42 @@ void buscarSolucion(archivo a){
     int *recorridoAux = (int*)malloc(sizeof(int)*0);
     int canAbiertos = 0; 
 	int canCerrados = 0;
+    aux = 0;
+    Estado estActual,estSiguiente;
     Estado * abiertos = (Estado*)malloc(sizeof(Estado)*canAbiertos);
 	Estado * cerrados = (Estado*)malloc(sizeof(Estado)*canCerrados);
+    Estado inicial = crearEstado(0,recorridoAux,0,a.matriz[0][1],a.matriz[0][0],aux);
+    abiertos = agregarEstado(abiertos,&canAbiertos,inicial);
+    while (canAbiertos > 0){
+        estActual = abiertos[0];
+        abiertos = eliminarEstado(abiertos,&canAbiertos);
+        cerrados = agregarEstado(cerrados,&canCerrados,estActual);
+        if (estadoCorte(estActual,a.pMax) == 1){
+            continue;
+        }else{
+            for (int i = 0; i < a.nFilas; i++){
+                if (verificarRecorrido(estActual.recorrido,estActual.lenRecorrido,i) == 0){ // sino esta, lo generamos
+                    int pActual = estActual.pActual + a.matriz[i][1];
+                    int maximoActual = estActual.maximoActual + a.matriz[i][0];
+                    estSiguiente = crearEstado(i,estActual.recorrido,estActual.lenRecorrido,pActual,maximoActual,estActual.id);
+                    abiertos = agregarEstado(abiertos,&canAbiertos,estSiguiente);
+                }
+            }   
+        }
+
+    }
+    mostrarEstados(cerrados,canCerrados);
+    
+}
+
+
+int verificarRecorrido(int *recorrido,int lenRecorrido,int valor){
+    for (int i = 0; i < lenRecorrido; i++){
+        if (recorrido[i] == valor){
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int *append(int *entrada,int lenRecorrido,int valorAgregar ){
@@ -112,6 +155,14 @@ Estado *eliminarEstado(Estado *abiertos, int *size){
 	free(abiertos);
 	return listaNueva;
 }
+// si se paso del pMax retorna 1
+int estadoCorte(Estado entrada,int pMax){
+    if (entrada.pActual >= pMax){
+        return 1;
+    }
+    return 0;
+    
+}
 
 Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar){
 	Estado * listaNueva = (Estado*)malloc(sizeof(Estado)*(*size+1));
@@ -122,4 +173,19 @@ Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar){
 	*size = *size + 1;
 	free(abiertos);
 	return listaNueva;
+}
+
+void mostrarEstados(Estado * cerrados, int canCerrados){
+    for (int i = 0; i < canCerrados; i++){
+        printf("ID: %d\n",cerrados[i].id);
+        printf("ID ANTERIOR: %d\n",cerrados[i].idAnterior);
+        printf("P ACTUAL: %d\n",cerrados[i].pActual);
+        printf("MAXIMO ACTUAL: %d\n",cerrados[i].maximoActual);
+        printf("RECORRIDO ACTUAL: ");
+        for (int j = 0; j < cerrados[i].lenRecorrido; j++){
+            printf("%d ",cerrados[i].recorrido[j]);
+        }
+        printf("\n\n");
+    }
+    
 }
