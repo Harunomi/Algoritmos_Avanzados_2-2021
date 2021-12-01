@@ -14,7 +14,7 @@ typedef struct estadoStruct{
     int id;
     int idAnterior;
     int filaActual;
-    int *recorrido;
+    char *recorrido;
     int lenRecorrido;
     int pActual;
     int maximoActual;
@@ -42,11 +42,18 @@ Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar);
 void mostrarEstados(Estado * cerrados, int canCerrados);
 
 int main(){
-    char nombreArchivo[30] = "knapPI_1_10_269.txt";
-    printf("Ingrese el nombre del archivo a leer (con su respectiva extension)\n");
-    //scanf("%s",nombreArchivo);
+    char nombreArchivo[30];
+    printf("Ingrese el nombre del archivo a leer (con su respectiva extension)\n knapPI_1_10_269.txt\n");
+    scanf("%s",nombreArchivo);
 
     archivo a = leerArchivo(nombreArchivo);
+    /* //mostrar matriz
+    printf("mostrare la matriz\n");
+    for (int i = 0; i < a.nFilas; i++){
+        printf("%d %d\n",a.matriz[i][0],a.matriz[i][1]);
+       
+    }
+    */
     buscarSolucion(a);
     return 0;
 }
@@ -73,15 +80,11 @@ archivo leerArchivo(char nombreArchivo[30]){
     }
     fclose(fp);
     return salida;
-    
-    
-
-    
 }
 
 
 void buscarSolucion(archivo a){
-    int *recorridoAux = (int*)malloc(sizeof(int)*0);
+    char *recorridoAux = (char*)malloc(sizeof(char)*1);
     int canAbiertos = 0; 
 	int canCerrados = 0;
     aux = 0;
@@ -89,18 +92,20 @@ void buscarSolucion(archivo a){
     Estado * abiertos = (Estado*)malloc(sizeof(Estado)*canAbiertos);
 	Estado * cerrados = (Estado*)malloc(sizeof(Estado)*canCerrados);
     Estado inicial = crearEstado(0,recorridoAux,0,a.matriz[0][1],a.matriz[0][0],aux);
+    printf("\ncreado estado inicial\n");
     abiertos = agregarEstado(abiertos,&canAbiertos,inicial);
     while (canAbiertos > 0){
         estActual = abiertos[0];
         abiertos = eliminarEstado(abiertos,&canAbiertos);
         cerrados = agregarEstado(cerrados,&canCerrados,estActual);
+        int pActual,maximoActual;
+
         if (estadoCorte(estActual,a.pMax) == 1){
-            continue;
         }else{
             for (int i = 0; i < a.nFilas; i++){
                 if (verificarRecorrido(estActual.recorrido,estActual.lenRecorrido,i) == 0){ // sino esta, lo generamos
-                    int pActual = estActual.pActual + a.matriz[i][1];
-                    int maximoActual = estActual.maximoActual + a.matriz[i][0];
+                    pActual = estActual.pActual + a.matriz[i][1];
+                    maximoActual = estActual.maximoActual + a.matriz[i][0];
                     estSiguiente = crearEstado(i,estActual.recorrido,estActual.lenRecorrido,pActual,maximoActual,estActual.id);
                     abiertos = agregarEstado(abiertos,&canAbiertos,estSiguiente);
                 }
@@ -124,23 +129,25 @@ int verificarRecorrido(int *recorrido,int lenRecorrido,int valor){
 
 int *append(int *entrada,int lenRecorrido,int valorAgregar ){
     int * listaNueva = (int*)malloc(sizeof(int)*(lenRecorrido+1));
-    for (int i = 0; i < lenRecorrido; i++){
+    int i;
+    for (i = 0; i < lenRecorrido; i++){
         listaNueva[i] = entrada[i];
     }
-    listaNueva[lenRecorrido+1] = valorAgregar;
+    listaNueva[i+1] = valorAgregar;
     return listaNueva;
     
 }
 
-Estado crearEstado(int filaActual,int *recorrido,int lenRecorrido,int pActual,int maximoActual,int id){
+Estado crearEstado(int filaActual,char *recorrido,int lenRecorrido,int pActual,int maximoActual,int id){
     Estado nuevoEstado;
     nuevoEstado.filaActual = filaActual;
-    int *recorridoNuevo = append(recorrido,lenRecorrido,filaActual);
+    char *recorridoNuevo;// append(recorrido,lenRecorrido,filaActual);
     nuevoEstado.recorrido = recorridoNuevo;
     nuevoEstado.pActual = pActual;
     nuevoEstado.maximoActual = maximoActual;
     nuevoEstado.lenRecorrido = lenRecorrido+1;
     nuevoEstado.id = aux;
+    aux++;
     nuevoEstado.idAnterior = id;
     return nuevoEstado;
 
@@ -157,8 +164,12 @@ Estado *eliminarEstado(Estado *abiertos, int *size){
 }
 // si se paso del pMax retorna 1
 int estadoCorte(Estado entrada,int pMax){
-    if (entrada.pActual >= pMax){
+    if (entrada.pActual > pMax){
         return 1;
+    }
+    if(entrada.pActual == pMax){
+        printf("id:%d\n",entrada.id);
+        printf("maximoActual:%d\n",entrada.maximoActual);
     }
     return 0;
     
