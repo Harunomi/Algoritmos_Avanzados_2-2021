@@ -31,9 +31,9 @@ int *append(int *entrada,int lenRecorrido,int valorAgregar );
 
 int estadoCorte(Estado entrada,int pMax);
 
-int verificarRecorrido(int *recorrido,int lenRecorrido,int valor);
+int verificarRecorrido(char *recorrido,int lenRecorrido,int valor);
 
-Estado crearEstado(int filaActual,int *recorrido,int lenRecorrido,int pActual,int maximoActual,int id);
+Estado crearEstado(int filaActual,char *recorrido,int lenRecorrido,int pActual,int maximoActual,int id);
 
 Estado *eliminarEstado(Estado *abiertos, int *size);
 
@@ -94,12 +94,11 @@ void buscarSolucion(archivo a){
     Estado inicial = crearEstado(0,recorridoAux,0,a.matriz[0][1],a.matriz[0][0],aux);
     printf("\ncreado estado inicial\n");
     abiertos = agregarEstado(abiertos,&canAbiertos,inicial);
+    int pActual,maximoActual;
     while (canAbiertos > 0){
         estActual = abiertos[0];
         abiertos = eliminarEstado(abiertos,&canAbiertos);
         cerrados = agregarEstado(cerrados,&canCerrados,estActual);
-        int pActual,maximoActual;
-
         if (estadoCorte(estActual,a.pMax) == 1){
         }else{
             for (int i = 0; i < a.nFilas; i++){
@@ -118,15 +117,18 @@ void buscarSolucion(archivo a){
 }
 
 
-int verificarRecorrido(int *recorrido,int lenRecorrido,int valor){
+int verificarRecorrido(char *recorrido,int lenRecorrido,int valor){
+    char* v;
+    itoa(valor,v,10);
     for (int i = 0; i < lenRecorrido; i++){
-        if (recorrido[i] == valor){
-            return 1;
-        }
+        //if (recorrido[i]==v){
+          //  return 1;
+        //}
+        printf("entre a verificar\n");
     }
     return 0;
 }
-
+/*
 int *append(int *entrada,int lenRecorrido,int valorAgregar ){
     int * listaNueva = (int*)malloc(sizeof(int)*(lenRecorrido+1));
     int i;
@@ -137,12 +139,17 @@ int *append(int *entrada,int lenRecorrido,int valorAgregar ){
     return listaNueva;
     
 }
+*/
 
 Estado crearEstado(int filaActual,char *recorrido,int lenRecorrido,int pActual,int maximoActual,int id){
     Estado nuevoEstado;
     nuevoEstado.filaActual = filaActual;
-    char *recorridoNuevo;// append(recorrido,lenRecorrido,filaActual);
-    nuevoEstado.recorrido = recorridoNuevo;
+    char* camino;
+    char* camino2;
+    itoa(filaActual,camino,10);
+    strcpy(camino2,recorrido);
+    strcpy(camino2,camino);
+    strcpy(nuevoEstado.recorrido,camino2);
     nuevoEstado.pActual = pActual;
     nuevoEstado.maximoActual = maximoActual;
     nuevoEstado.lenRecorrido = lenRecorrido+1;
@@ -187,16 +194,21 @@ Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar){
 }
 
 void mostrarEstados(Estado * cerrados, int canCerrados){
-    for (int i = 0; i < canCerrados; i++){
-        printf("ID: %d\n",cerrados[i].id);
-        printf("ID ANTERIOR: %d\n",cerrados[i].idAnterior);
-        printf("P ACTUAL: %d\n",cerrados[i].pActual);
-        printf("MAXIMO ACTUAL: %d\n",cerrados[i].maximoActual);
-        printf("RECORRIDO ACTUAL: ");
-        for (int j = 0; j < cerrados[i].lenRecorrido; j++){
-            printf("%d ",cerrados[i].recorrido[j]);
-        }
-        printf("\n\n");
-    }
+    int mayor,posicion,i;
+    mayor=0;
+    posicion=0;
     
+    for (i = 0; i < canCerrados; i++){
+        if(cerrados[i].maximoActual>mayor){
+            posicion=i;
+            mayor=cerrados[i].maximoActual;
+        }
+    }
+    printf("ID: %d\n",cerrados[posicion].id);
+    printf("ID ANTERIOR: %d\n",cerrados[posicion].idAnterior);
+    printf("P ACTUAL: %d\n",cerrados[posicion].pActual);
+    printf("MAXIMO ACTUAL: %d\n",cerrados[posicion].maximoActual);
+    printf("RECORRIDO ACTUAL: ");
+    printf("%s\n",cerrados[posicion].recorrido);
+    printf("\n\n");
 }
