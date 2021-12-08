@@ -9,13 +9,16 @@ typedef struct archivoALeer{
     int **matriz;
 }archivo;
 
+typedef struct intArray{
+    int numero; 
+    int largo;
+}Array;
 
 typedef struct estadoStruct{
     int id;
     int idAnterior;
     int filaActual;
-    char *recorrido;
-    int lenRecorrido;
+    Array recorrido;
     int pActual;
     int maximoActual;
     // agregar mas
@@ -27,19 +30,19 @@ archivo leerArchivo(char nombreArchivo[30]);
 
 void buscarSolucion(archivo a);
 
-int *append(int *entrada,int lenRecorrido,int valorAgregar );
-
 int estadoCorte(Estado entrada,int pMax);
 
-int verificarRecorrido(char *recorrido,int lenRecorrido,int valor);
-
-Estado crearEstado(int filaActual,char *recorrido,int lenRecorrido,int pActual,int maximoActual,int id);
+Estado crearEstado(int filaActual,Array recorrido,int pActual,int maximoActual,int id);
 
 Estado *eliminarEstado(Estado *abiertos, int *size);
 
 Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar);
 
 void mostrarEstados(Estado * cerrados, int canCerrados);
+
+int buscarEntero(Array *lista);
+
+Array* agregarEntero(Array* lista, int numero);
 
 int main(){
     char nombreArchivo[30];
@@ -54,7 +57,25 @@ int main(){
        
     }
     */
-    buscarSolucion(a);
+    //buscarSolucion(a);
+    Array *lista = (Array*)malloc(sizeof(Array)*1);
+    lista[0].largo = 1;
+    lista[0].numero = 1;
+    lista = agregarEntero(lista,2);
+    lista = agregarEntero(lista,2);
+    lista = agregarEntero(lista,3);
+    lista = agregarEntero(lista,4);
+    lista = agregarEntero(lista,5);
+    lista = agregarEntero(lista,6);
+    lista = agregarEntero(lista,7);
+    lista = agregarEntero(lista,8);
+    lista = agregarEntero(lista,9);
+    for (int i = 0; i < lista[1].largo; i++){
+        printf("%d ",lista[i].numero);
+    }
+    printf("\nLargo de la lista: %d",lista[1].largo);
+    
+
     return 0;
 }
 archivo leerArchivo(char nombreArchivo[30]){
@@ -82,7 +103,7 @@ archivo leerArchivo(char nombreArchivo[30]){
     return salida;
 }
 
-
+/*
 void buscarSolucion(archivo a){
     char *recorridoAux = (char*)malloc(sizeof(char)*1);
     int canAbiertos = 0; 
@@ -115,44 +136,15 @@ void buscarSolucion(archivo a){
     mostrarEstados(cerrados,canCerrados);
     
 }
-
-
-int verificarRecorrido(char *recorrido,int lenRecorrido,int valor){
-    char* v;
-    itoa(valor,v,10);
-    for (int i = 0; i < lenRecorrido; i++){
-        //if (recorrido[i]==v){
-          //  return 1;
-        //}
-        printf("entre a verificar\n");
-    }
-    return 0;
-}
-/*
-int *append(int *entrada,int lenRecorrido,int valorAgregar ){
-    int * listaNueva = (int*)malloc(sizeof(int)*(lenRecorrido+1));
-    int i;
-    for (i = 0; i < lenRecorrido; i++){
-        listaNueva[i] = entrada[i];
-    }
-    listaNueva[i+1] = valorAgregar;
-    return listaNueva;
-    
-}
 */
 
-Estado crearEstado(int filaActual,char *recorrido,int lenRecorrido,int pActual,int maximoActual,int id){
+
+
+Estado crearEstado(int filaActual,Array recorrido,int pActual,int maximoActual,int id){
     Estado nuevoEstado;
     nuevoEstado.filaActual = filaActual;
-    char* camino;
-    char* camino2;
-    itoa(filaActual,camino,10);
-    strcpy(camino2,recorrido);
-    strcpy(camino2,camino);
-    strcpy(nuevoEstado.recorrido,camino2);
     nuevoEstado.pActual = pActual;
     nuevoEstado.maximoActual = maximoActual;
-    nuevoEstado.lenRecorrido = lenRecorrido+1;
     nuevoEstado.id = aux;
     aux++;
     nuevoEstado.idAnterior = id;
@@ -211,4 +203,24 @@ void mostrarEstados(Estado * cerrados, int canCerrados){
     printf("RECORRIDO ACTUAL: ");
     printf("%s\n",cerrados[posicion].recorrido);
     printf("\n\n");
+}
+
+int buscarEntero(Array *lista){
+
+    return 0;
+}
+
+Array* agregarEntero(Array* lista,int numero){
+    Array* listaNueva = (Array*)malloc(sizeof(Array)*(lista[0].largo+1));
+    for (int i = 0; i < lista[0].largo; i++){
+        listaNueva[i].numero = lista[i].numero;
+        listaNueva[i].largo = lista[i].largo+1;
+
+    }
+    listaNueva[lista[0].largo].numero = numero;
+    listaNueva[lista[0].largo].largo = lista[0].largo+1;
+
+    return listaNueva;
+    
+
 }
