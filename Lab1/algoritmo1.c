@@ -105,12 +105,12 @@ void buscarSolucion(archivo a){
     abiertos = agregarEstado(abiertos,&canAbiertos,inicial);
     int pActual,maximoActual;
     while (canAbiertos > 0){
-        estActual = abiertos[0];
+        estActual = abiertos[0];//tomo el estado
         abiertos = eliminarEstado(abiertos,&canAbiertos);
-        cerrados = agregarEstado(cerrados,&canCerrados,estActual);
-        if (estadoCorte(estActual,a.pMax) == 1){
+        if (estadoCorte(estActual,a.pMax) == 1){//si no cumple lo desechamos
             continue;
-        }else{
+        }else{//si cumple lo agregamos en cerrados y seguimos con el ciclo
+            cerrados = agregarEstado(cerrados,&canCerrados,estActual);
             for (int i = 0; i < a.nFilas; i++){
                 if (verificarRecorrido(estActual.recorrido,i) == 0){ // sino esta, lo generamos
                     pActual = estActual.pActual + a.matriz[i][1];
