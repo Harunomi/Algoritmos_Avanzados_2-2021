@@ -89,6 +89,7 @@ void buscarSolucion(archivo a){
     int canAbiertos = 0; 
 	int canCerrados = 0;
     aux = 0;
+    int contador = 0;
     Estado estActual,estSiguiente;
     Estado * abiertos = (Estado*)malloc(sizeof(Estado)*canAbiertos);
 	Estado * cerrados = (Estado*)malloc(sizeof(Estado)*canCerrados);
@@ -108,6 +109,7 @@ void buscarSolucion(archivo a){
         abiertos = eliminarEstado(abiertos,&canAbiertos);
         cerrados = agregarEstado(cerrados,&canCerrados,estActual);
         if (estadoCorte(estActual,a.pMax) == 1){
+            continue;
         }else{
             for (int i = 0; i < a.nFilas; i++){
                 if (verificarRecorrido(estActual.recorrido,i) == 0){ // sino esta, lo generamos
@@ -115,6 +117,10 @@ void buscarSolucion(archivo a){
                     maximoActual = estActual.maximoActual + a.matriz[i][0];
                     estSiguiente = crearEstado(i,estActual.recorrido,pActual,maximoActual,estActual.id);
                     abiertos = agregarEstado(abiertos,&canAbiertos,estSiguiente);
+                    contador++;
+                    if(contador%10000 == 0){
+                        printf("EL PEPE   %d\n",contador);
+                    }
                 }
             }   
         }
@@ -160,10 +166,10 @@ int estadoCorte(Estado entrada,int pMax){
     if (entrada.pActual > pMax){
         return 1;
     }
-    if(entrada.pActual == pMax){
+    /*if(entrada.pActual == pMax){
         printf("id:%d\n",entrada.id);
         printf("maximoActual:%d\n",entrada.maximoActual);
-    }
+    }*/
     return 0;
     
 }
@@ -195,7 +201,10 @@ void mostrarEstados(Estado * cerrados, int canCerrados){
     printf("P ACTUAL: %d\n",cerrados[posicion].pActual);
     printf("MAXIMO ACTUAL: %d\n",cerrados[posicion].maximoActual);
     printf("RECORRIDO ACTUAL: ");
-    printf("%s\n",cerrados[posicion].recorrido);
+    for (int j = 0; j < cerrados[posicion].recorrido[0].largo; j++){
+        printf("%d ",cerrados[posicion].recorrido[j].numero);
+    }
+    
     printf("\n\n");
 }
 
@@ -216,5 +225,10 @@ Array* agregarEntero(Array* lista,int numero){
 
     return listaNueva;
     
+
+}
+
+void buscarMayor(Estado* lista,int total){
+    int mayorActual;
 
 }
