@@ -18,7 +18,7 @@ typedef struct estadoStruct{
     int id;
     int idAnterior;
     int filaActual;
-    Array recorrido;
+    Array* recorrido;
     int pActual;
     int maximoActual;
     // agregar mas
@@ -32,7 +32,7 @@ void buscarSolucion(archivo a);
 
 int estadoCorte(Estado entrada,int pMax);
 
-Estado crearEstado(int filaActual,Array recorrido,int pActual,int maximoActual,int id);
+Estado crearEstado(int filaActual,Array* recorrido,int pActual,int maximoActual,int id);
 
 Estado *eliminarEstado(Estado *abiertos, int *size);
 
@@ -42,6 +42,8 @@ void mostrarEstados(Estado * cerrados, int canCerrados);
 
 int buscarEntero(Array *lista);
 
+int verificarRecorrido(Array* lista,int buscar);
+
 Array* agregarEntero(Array* lista, int numero);
 
 int main(){
@@ -50,31 +52,8 @@ int main(){
     scanf("%s",nombreArchivo);
 
     archivo a = leerArchivo(nombreArchivo);
-    /* //mostrar matriz
-    printf("mostrare la matriz\n");
-    for (int i = 0; i < a.nFilas; i++){
-        printf("%d %d\n",a.matriz[i][0],a.matriz[i][1]);
-       
-    }
-    */
-    //buscarSolucion(a);
-    Array *lista = (Array*)malloc(sizeof(Array)*1);
-    lista[0].largo = 1;
-    lista[0].numero = 1;
-    lista = agregarEntero(lista,2);
-    lista = agregarEntero(lista,2);
-    lista = agregarEntero(lista,3);
-    lista = agregarEntero(lista,4);
-    lista = agregarEntero(lista,5);
-    lista = agregarEntero(lista,6);
-    lista = agregarEntero(lista,7);
-    lista = agregarEntero(lista,8);
-    lista = agregarEntero(lista,9);
-    for (int i = 0; i < lista[1].largo; i++){
-        printf("%d ",lista[i].numero);
-    }
-    printf("\nLargo de la lista: %d",lista[1].largo);
-    
+    buscarSolucion(a);
+   
 
     return 0;
 }
@@ -103,16 +82,24 @@ archivo leerArchivo(char nombreArchivo[30]){
     return salida;
 }
 
-/*
 void buscarSolucion(archivo a){
-    char *recorridoAux = (char*)malloc(sizeof(char)*1);
+    Array* listaVacia =(Array*)malloc(sizeof(Array)*1);
+    listaVacia[0].numero=0;
+    listaVacia[0].largo=1;
     int canAbiertos = 0; 
 	int canCerrados = 0;
     aux = 0;
     Estado estActual,estSiguiente;
     Estado * abiertos = (Estado*)malloc(sizeof(Estado)*canAbiertos);
 	Estado * cerrados = (Estado*)malloc(sizeof(Estado)*canCerrados);
-    Estado inicial = crearEstado(0,recorridoAux,0,a.matriz[0][1],a.matriz[0][0],aux);
+    //creamos y rellenamos el estado inicial de forma manual
+    Estado inicial;
+    inicial.id=0;
+    inicial.filaActual=0;
+    inicial.recorrido=listaVacia;
+    inicial.pActual=0;
+    inicial.maximoActual=0;
+
     printf("\ncreado estado inicial\n");
     abiertos = agregarEstado(abiertos,&canAbiertos,inicial);
     int pActual,maximoActual;
@@ -123,10 +110,10 @@ void buscarSolucion(archivo a){
         if (estadoCorte(estActual,a.pMax) == 1){
         }else{
             for (int i = 0; i < a.nFilas; i++){
-                if (verificarRecorrido(estActual.recorrido,estActual.lenRecorrido,i) == 0){ // sino esta, lo generamos
+                if (verificarRecorrido(estActual.recorrido,i) == 0){ // sino esta, lo generamos
                     pActual = estActual.pActual + a.matriz[i][1];
                     maximoActual = estActual.maximoActual + a.matriz[i][0];
-                    estSiguiente = crearEstado(i,estActual.recorrido,estActual.lenRecorrido,pActual,maximoActual,estActual.id);
+                    estSiguiente = crearEstado(i,estActual.recorrido,pActual,maximoActual,estActual.id);
                     abiertos = agregarEstado(abiertos,&canAbiertos,estSiguiente);
                 }
             }   
@@ -136,12 +123,19 @@ void buscarSolucion(archivo a){
     mostrarEstados(cerrados,canCerrados);
     
 }
-*/
-
-
-
-Estado crearEstado(int filaActual,Array recorrido,int pActual,int maximoActual,int id){
+int verificarRecorrido(Array* lista,int buscar){
+    int i;
+    for(i=0;i<lista[0].largo;i++){
+        if(lista[i].numero==buscar){
+            return 1;
+        }
+    }
+    return 0;
+}
+Estado crearEstado(int filaActual,Array* recorrido,int pActual,int maximoActual,int id){
     Estado nuevoEstado;
+    Array* lista =agregarEntero(recorrido,filaActual);
+    nuevoEstado.recorrido=lista;
     nuevoEstado.filaActual = filaActual;
     nuevoEstado.pActual = pActual;
     nuevoEstado.maximoActual = maximoActual;
