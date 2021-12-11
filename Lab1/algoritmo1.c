@@ -48,7 +48,7 @@ Array* agregarEntero(Array* lista, int numero);
 
 int main(){
     char nombreArchivo[30];
-    printf("Ingrese el nombre del archivo a leer (con su respectiva extension)\n knapPI_1_10_269.txt\n");
+    printf("Ingrese el nombre del archivo a leer (con su respectiva extension)\npor ejemplo knapPI_1_10_269.txt\n");
     scanf("%s",nombreArchivo);
 
     archivo a = leerArchivo(nombreArchivo);
@@ -89,7 +89,7 @@ void buscarSolucion(archivo a){
     int canAbiertos = 0; 
 	int canCerrados = 0;
     aux = 0;
-    int contador = 0;
+    //int contador = 0; este contador lo usamos solo para tener feedback cuando probamos el codigo
     Estado estActual,estSiguiente;
     Estado * abiertos = (Estado*)malloc(sizeof(Estado)*canAbiertos);
 	Estado * cerrados = (Estado*)malloc(sizeof(Estado)*canCerrados);
@@ -101,7 +101,7 @@ void buscarSolucion(archivo a){
     inicial.pActual=0;
     inicial.maximoActual=0;
 
-    printf("\ncreado estado inicial\n");
+    printf("\nEspere un momento estamos generando la solucion\n"); 
     abiertos = agregarEstado(abiertos,&canAbiertos,inicial);
     int pActual,maximoActual;
     while (canAbiertos > 0){
@@ -117,10 +117,10 @@ void buscarSolucion(archivo a){
                     maximoActual = estActual.maximoActual + a.matriz[i][0];
                     estSiguiente = crearEstado(i,estActual.recorrido,pActual,maximoActual,estActual.id);
                     abiertos = agregarEstado(abiertos,&canAbiertos,estSiguiente);
-                    contador++;
-                    if(contador%10000 == 0){
-                        printf("EL PEPE   %d\n",contador);
-                    }
+                   //contador++; //este contador lo usamos solo para tener feedback cuando probamos el codigo
+                    /*if(contador%10000 == 0){
+                        printf("posibles soluciones  %d\n",contador);
+                    }*/
                 }
             }   
         }
@@ -189,22 +189,18 @@ void mostrarEstados(Estado * cerrados, int canCerrados){
     int mayor,posicion,i;
     mayor=0;
     posicion=0;
-    
+    printf("Buscando la mejor solucion...\n");
     for (i = 0; i < canCerrados; i++){
         if(cerrados[i].maximoActual>mayor){
             posicion=i;
             mayor=cerrados[i].maximoActual;
         }
     }
+    printf("\nSolucion encontrada\n\n");
     printf("ID: %d\n",cerrados[posicion].id);
     printf("ID ANTERIOR: %d\n",cerrados[posicion].idAnterior);
     printf("P ACTUAL: %d\n",cerrados[posicion].pActual);
     printf("MAXIMO ACTUAL: %d\n",cerrados[posicion].maximoActual);
-    printf("RECORRIDO ACTUAL: ");
-    for (int j = 0; j < cerrados[posicion].recorrido[0].largo; j++){
-        printf("%d ",cerrados[posicion].recorrido[j].numero);
-    }
-    
     printf("\n\n");
 }
 
