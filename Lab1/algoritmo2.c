@@ -71,7 +71,7 @@ void buscarSolucion(archivo a){
     Estado estActual, estSiguiente, inicial;
     Estado * abiertos = (Estado*)malloc(sizeof(Estado)*canAbiertos);
 	Estado * cerrados = (Estado*)malloc(sizeof(Estado)*canCerrados);
-    printf("GENERANDO LAS SOLUCIONES POSIBLES...\n");
+    printf("GENERANDO LAS SOLUCIONES POSIBLES...\n\n");
     for (int i = 0; i < a.nTamanio; i++){
         Array* listaVacia =(Array*)malloc(sizeof(Array)*1);
         listaVacia[0].numero=i;
@@ -102,17 +102,13 @@ void buscarSolucion(archivo a){
         if(cerrados[i].recorrido[0].largo == a.nTamanio){
             estSiguiente = crearEstado(cerrados[i].recorrido[0].numero,cerrados[i].recorrido,cerrados[i].pActual,a.grafo[cerrados[i].posicionActual][cerrados[i].recorrido[0].numero],cerrados[i].id);
             if (estadoCorte(estSiguiente,a.pMax) == 1){
+                printf("Encontrada la siguiente Solucion\n\n");
                 mostrarEstado(estSiguiente);
                 break;
             }
         }
 
     }   
-
-
-
-    
-
 }
 
 
