@@ -8,12 +8,17 @@ typedef struct archivoALeer{
     int **grafo;
 }archivo;
 
+typedef struct intArray{
+    int numero; 
+    int largo;
+}Array;
+
 typedef struct estadoStruct{
     int id;
     int idAnterior;
+    int posicionInicial;
     int posicionActual;
-    int* recorrido;
-    int tamanioRecorrido;
+    Array *recorrido;
     int pActual;
 }Estado;
 
@@ -21,61 +26,130 @@ int aux;//variable para las IDs
 
 archivo leerArchivo(char nombreArchivo[30]);
 
-Estado crearEstado(int posicionActual,int* recorrido,int tamanio,int pActual,int pTraslado,int id);
+Estado crearEstado(int posicionActual,Array* recorrido,int pActual,int pTraslado,int id);
+
+Estado crearEstadoInicial(int posicionActual,Array* recorrido);
 
 Estado *eliminarEstado(Estado *abiertos, int *size);
 
 Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar);
 
-int verificarRecorrido(int* lista,int buscar,int tamanio);
+Array* agregarEntero(Array* lista,int numero);
+
+int verificarRecorrido(Array* lista,int buscar);
+
+int estadoCorte(Estado e,int pMax);
+
+void buscarSolucion(archivo a);
 
 void mostrarEstado(Estado A);
+
+
+
+
 int main(){
     char nombreArchivo[30];
-    printf("Ingrese el nombre del archivo a leer (con su respectiva extension)\npor ejemplo RT_4_30.txt\n");
+    printf("Ingrese el nombre del archivo a leer (con su respectiva extension)\n");
+    printf("RT_4_30.txt\nRT_6_78.txt\n");
+
     scanf("%s",nombreArchivo);
+    printf("\n");
 
-    archivo A=leerArchivo(nombreArchivo); //generar grafo
-    //prueba crear estado
-    Estado inicial;
-    int* L=(int*)malloc(sizeof(int)*2);
-    L[0]=1;
-    L[1]=2;
-    inicial=crearEstado(1,L,2,0,8,0);
-    mostrarEstado(inicial);
-   
+    archivo a=leerArchivo(nombreArchivo); //generar grafo
 
+    buscarSolucion(a);
+    
     return 0;
 }
-void mostrarEstado(Estado A){
-    printf("\n\n");
-    printf("id : %d\n",A.id);
-    printf("pActual : %d\n",A.pActual);
-    int i;
-    printf("recorrido\n");
-    for(i=0;i<A.tamanioRecorrido;i++){
-        printf("%d ",A.recorrido[i]);
+
+void buscarSolucion(archivo a){
+    
+    int canAbiertos = 0; 
+	int canCerrados = 0;
+    aux = 0;
+    //int contador = 0; este contador lo usamos solo para tener feedback cuando probamos el codigo
+    Estado estActual, estSiguiente, inicial;
+    Estado * abiertos = (Estado*)malloc(sizeof(Estado)*canAbiertos);
+	Estado * cerrados = (Estado*)malloc(sizeof(Estado)*canCerrados);
+    printf("GENERANDO LAS SOLUCIONES POSIBLES...\n");
+    for (int i = 0; i < a.nTamanio; i++){
+        Array* listaVacia =(Array*)malloc(sizeof(Array)*1);
+        listaVacia[0].numero=i;
+        listaVacia[0].largo=1;
+        inicial = crearEstadoInicial(i,listaVacia);
+        abiertos = agregarEstado(abiertos,&canAbiertos,inicial);
+
+    }
+
+    while(canAbiertos>0){
+        estActual = abiertos[0];
+        abiertos = eliminarEstado(abiertos,&canAbiertos);
+        cerrados = agregarEstado(cerrados,&canCerrados,estActual);
+        for (int i = 0; i < a.nTamanio; i++){
+            if((a.grafo[estActual.posicionActual][i] != -1) && (verificarRecorrido(estActual.recorrido,i) == 0)){
+                estSiguiente = crearEstado(i,estActual.recorrido,estActual.pActual,a.grafo[estActual.posicionActual][i],estActual.id);
+                abiertos = agregarEstado(abiertos,&canAbiertos,estSiguiente);
+            }
+        }
+    }
+
+    
+    for (int i = 0; i < canCerrados; i++){
+        //mostrarEstado(cerrados[i]);
+        int suma;
+        int valorGrafo;
+        int n,m;
+        if(cerrados[i].recorrido[0].largo == a.nTamanio){
+            estSiguiente = crearEstado(cerrados[i].recorrido[0].numero,cerrados[i].recorrido,cerrados[i].pActual,a.grafo[cerrados[i].posicionActual][cerrados[i].recorrido[0].numero],cerrados[i].id);
+            if (estadoCorte(estSiguiente,a.pMax) == 1){
+                mostrarEstado(estSiguiente);
+                break;
+            }
+        }
+
+    }   
+
+
+
+    
+
+}
+
+
+
+void mostrarEstado(Estado e){
+    printf("id: %d      idAnterior: %d\n",e.id,e.idAnterior);
+    printf("posicionActual: %d      pActual: %d\n",e.posicionActual,e.pActual);
+    printf("Recorrido: ");
+    for (int i = 0; i < e.recorrido[0].largo; i++){
+        printf("%d ",e.recorrido[i].numero);
     }
     printf("\n\n");
 }
-Estado crearEstado(int posicionActual,int* recorrido,int tamanio,int pActual,int pTraslado,int id){
-    Estado salida;
 
-    int* nuevoRec = (int*)malloc(sizeof(int)*tamanio+1);
-    int i;
-    for(i=0;i<tamanio;i++){
-        nuevoRec[i]=recorrido[i];
-    }
-    nuevoRec[tamanio+1]=posicionActual;
-    //ahora relleno la struct
-    salida.id=aux;
+Estado crearEstadoInicial(int posicionActual,Array* recorrido){
+    Estado nuevo; 
+    nuevo.posicionActual = posicionActual;
+    nuevo.posicionInicial = posicionActual;
+    nuevo.recorrido = recorrido;
+    nuevo.id = aux;
     aux++;
-    salida.idAnterior=id;
-    salida.posicionActual=posicionActual;
-    salida.recorrido=nuevoRec;
-    salida.tamanioRecorrido=tamanio+1;
-    salida.pActual=pActual+pTraslado;
+    nuevo.pActual = 0;
+    nuevo.idAnterior = -1;
+    return nuevo; 
+    
+}
 
+Estado crearEstado(int posicionActual,Array* recorrido,int pActual,int pTraslado,int id){
+    Estado salida;
+    Array* nuevoRec = agregarEntero(recorrido,posicionActual);
+    //ahora relleno la struct
+    salida.id = aux;
+    aux++;
+    salida.idAnterior = id;
+    salida.posicionActual = posicionActual;
+    salida.recorrido = nuevoRec;
+    salida.pActual = pActual + pTraslado;
     return salida;
 
 }
@@ -100,17 +174,25 @@ Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar){
 	free(abiertos);
 	return listaNueva;
 }
-int verificarRecorrido(int* lista,int buscar,int tamanio){
+
+int verificarRecorrido(Array* lista,int buscar){
     int i;
     //1 si esta, 0 si no esta
-    for (int i = 0; i < tamanio; i++){
-		if(lista[i]==buscar){
+    for(int i = 0; i < lista[0].largo; i++){
+		if(lista[i].numero==buscar){
             return 1;
         }
 	}
     return 0;
 }
 
+int estadoCorte(Estado e,int pMax){
+    if(e.pActual == pMax){
+        return 1;
+    }
+    return 0;
+
+}
 archivo leerArchivo(char nombreArchivo[30]){
     FILE *fp = fopen(nombreArchivo,"r");
     archivo salida;
@@ -137,10 +219,23 @@ archivo leerArchivo(char nombreArchivo[30]){
             //ahora leemos el grafo
             fscanf(fp,"%d", &valor);
             salida.grafo[i][j]=valor;
-            printf("%d ",valor);
         }
-        printf("\n");
     }
     fclose(fp);
     return salida;
+}
+
+Array* agregarEntero(Array* lista,int numero){
+    Array* listaNueva = (Array*)malloc(sizeof(Array)*(lista[0].largo+1));
+    for (int i = 0; i < lista[0].largo; i++){
+        listaNueva[i].numero = lista[i].numero;
+        listaNueva[i].largo = lista[i].largo+1;
+
+    }
+    listaNueva[lista[0].largo].numero = numero;
+    listaNueva[lista[0].largo].largo = lista[0].largo+1;
+
+    return listaNueva;
+    
+
 }
