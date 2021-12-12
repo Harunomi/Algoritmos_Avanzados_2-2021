@@ -40,7 +40,6 @@ Estado *agregarEstado(Estado * abiertos,int * size, Estado paraAgregar);
 
 void mostrarEstados(Estado * cerrados, int canCerrados);
 
-int buscarEntero(Array *lista);
 
 int verificarRecorrido(Array* lista,int buscar);
 
@@ -204,10 +203,6 @@ void mostrarEstados(Estado * cerrados, int canCerrados){
     printf("\n\n");
 }
 
-int buscarEntero(Array *lista){
-
-    return 0;
-}
 
 Array* agregarEntero(Array* lista,int numero){
     Array* listaNueva = (Array*)malloc(sizeof(Array)*(lista[0].largo+1));
@@ -221,10 +216,5 @@ Array* agregarEntero(Array* lista,int numero){
 
     return listaNueva;
     
-
-}
-
-void buscarMayor(Estado* lista,int total){
-    int mayorActual;
 
 }
