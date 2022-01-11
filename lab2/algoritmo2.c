@@ -18,7 +18,15 @@ typedef struct estadoStruct{
 
 archivo leerArchivo(char nombreArchivo[30]);
 
-
+int estaEn(int*recorrido,int j,int tam){
+    int i;
+    for(i=0;i<tam;i++){
+        if(recorrido[i]==j){
+            return 0;
+        }
+    }
+    return 1;
+}
 
 int main(){
     char nombreArchivo[30];
@@ -33,19 +41,50 @@ int main(){
     //nuestro criterio sera tomar el camino demenos peso
     //no podemos ir a un nodo que ya fue visitado, tampoco podemos tomar los caminos con valor -1
     //ya que estos representan el nodo en el que nos encontramos actualmente
-    int i,j,pos;
-    pos=0;
-
-    for(i=0;i<a.nTamanio;i++){//recorrer columna1 (el nodo)
-        for(j=0;j<a.nTamanio;j++){//recorrer la filaN en la que estamos( para seleccionar camino mas corto)
-            //buscar el mas corto que no sea -1 y que no hayamos pasado por ahi 
-            //aqui designamos tambien el siguiente valor de pos
-        }
-        //hacer el movimineto una vez revisada toda la fila
-        //pos seria el nodo que visitamos(inicia en 0)
-
+    int i,j,Pos,menor;
+    Pos=0;
+    int nPos=0;
+    menor=a.grafo[0][0];
+    int menorA;
+    if(a.grafo[0][0]==-1){
+        menor=a.grafo[0][1];
     }
-    
+    int* recorrido=(int*)malloc(sizeof(int)*a.nTamanio);
+    int e=0;
+    recorrido[e]=0; //lista de recorrido
+    e++;//cantidad de nodos visitados
+
+    int avanzar=0;//condicion para detener el while
+    int valorTotal=0;
+    while(avanzar!=a.nTamanio){//recorrer columna1 (el nodo)
+        for(j=0;j<a.nTamanio;j++){//recorrer la filaN en la que estamos( para seleccionar camino mas corto)
+            if(a.grafo[nPos][j]<menor){//criterio de menor peso
+                if(a.grafo[nPos][j]!=-1){//no poder ir al mismo nodo donde uno ya esta
+                    if(estaEn(recorrido,j,e)){//comprobar el nodo de destino no esta dentro de los visitados
+                        menor=a.grafo[nPos][j];//actualizamos el menor
+                        Pos=j;//guardamos el grafo al que ir
+                        printf("vamos hacia %d\n",j);
+                        valorTotal=valorTotal+a.grafo[nPos][j];
+                        
+                    }
+                }
+            }
+        }
+        //aqui estan los calculos de avanzar al siguiente nodo
+        recorrido[e]=Pos;
+        e++;
+        menorA=menor;
+        menor=a.grafo[nPos][0];
+        nPos=Pos;
+        if(menorA==menor){
+            menor=a.grafo[nPos][1];
+        }else{
+            menor=a.grafo[nPos][0];
+        }
+        avanzar++;
+    }
+    //la suma representa el volver a la coordenada inicial
+    printf("el valor total es %d\n",valorTotal+a.grafo[Pos][0]);
     return 0;
 }
 
