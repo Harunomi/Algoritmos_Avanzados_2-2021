@@ -15,32 +15,62 @@ typedef struct archivoALeer{
 }archivo;
 
 typedef struct estadoStruct{
-    int* recorrido;
     int pActual;
     int maximoActual;
 }Estado;
 int aux;
 archivo leerArchivo(char nombreArchivo[30]);
 
+void intercambiar(fila* a, fila* b) {
+  fila temporal = *a;
+  *a = *b;
+  *b = temporal;
+}
+int particion(fila* arreglo, int izquierda, int derecha) {
+  float pivote = arreglo[izquierda].ponderacion;
+  while (1) {
+    while (arreglo[derecha].ponderacion < pivote) {
+      derecha--;
+    }
+    while (arreglo[izquierda].ponderacion > pivote) {
+      izquierda++;
+    }
+    if (izquierda >= derecha) {
+      return derecha;
+    }else{
+      intercambiar(&arreglo[izquierda], &arreglo[derecha]);
+      izquierda++;
+      derecha--;
+    }
+    }
+}
+void quicksort(fila* arreglo, int izquierda, int derecha) {
+  if (izquierda < derecha) {
+    int indiceParticion = particion(arreglo, izquierda, derecha);
+    quicksort(arreglo, izquierda, indiceParticion);
+    quicksort(arreglo, indiceParticion + 1, derecha);
+  }
+}
+
 int main(){
     char nombreArchivo[30];
     printf("Ingrese el nombre del archivo a leer (con su respectiva extension)\npor ejemplo knapPI_1_10_269.txt\n");
     scanf("%s",nombreArchivo);
     aux=0;
+    Estado solucion;
     archivo a = leerArchivo(nombreArchivo);
-    //ordenamos por mayor ponderacion v/p 
-        //(quicksort)
-    //greedy por mayor v/p
-    /*int i=0;
+    solucion.pActual=0;
+    solucion.maximoActual=0;
+    int i=0;
     while((i<=a.nFilas) && (solucion.pActual<a.pMax)){
-        if(solucion.pActual+a.matriz[i][1]<=a.pMax){
-            solucion.pActual = solucion.pActual+a.matriz[i][1];
-            solucion.maximoActual=solucion.maximoActual+a.matriz[i][0];
+        if(solucion.pActual+a.lista[i].p<=a.pMax){
+            solucion.pActual = solucion.pActual+a.lista[i].p;
+            solucion.maximoActual=solucion.maximoActual+a.lista[i].v;
         }
         i = i + 1;
-    }*/
-    //entregamos solucion del greedy
-        //la mejor solucion es mostrarsolucion(solucion)
+    }
+    printf("la solucion es \n");
+    printf("peso izq %d , valor derecho %d \n",solucion.maximoActual,solucion.pActual);
     return 0;
 }
 archivo leerArchivo(char nombreArchivo[30]){
@@ -63,11 +93,17 @@ archivo leerArchivo(char nombreArchivo[30]){
         datos.ponderacion= (datos.v/datos.p);
         lista[i]=datos;
     }
-    salida.lista=lista;
     printf("leido\n\n");
     for (int i = 0; i < salida.nFilas; i++){
         printf("%f %f %f \n",lista[i].v,lista[i].p,lista[i].ponderacion); 
     }
+     printf("\n\n"); 
+    quicksort(lista,0,salida.nFilas);
+    for (int i = 0; i < salida.nFilas; i++){
+        printf("%f %f %f \n",lista[i].v,lista[i].p,lista[i].ponderacion); 
+    }
+    
+    salida.lista=lista;
     printf("\n");
     fclose(fp);
     return salida;
