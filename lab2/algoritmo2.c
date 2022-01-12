@@ -63,7 +63,7 @@ int main(){
                     if(estaEn(recorrido,j,e)){//comprobar el nodo de destino no esta dentro de los visitados
                         menor=a.grafo[nPos][j];//actualizamos el menor
                         Pos=j;//guardamos el grafo al que ir
-                        printf("vamos hacia %d\n",j);
+                        
                         valorTotal=valorTotal+a.grafo[nPos][j];
                         
                     }
