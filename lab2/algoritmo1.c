@@ -69,8 +69,7 @@ int main(){
         }
         i = i + 1;
     }
-    printf("la solucion es \n");
-    printf("peso izq %d , valor derecho %d \n",solucion.maximoActual,solucion.pActual);
+    printf("el valor encontrado fue %d\nutilizando el criterio de maximizar el resultado de valor/ponderacion",solucion.pActual);
     return 0;
 }
 archivo leerArchivo(char nombreArchivo[30]){
@@ -93,15 +92,7 @@ archivo leerArchivo(char nombreArchivo[30]){
         datos.ponderacion= (datos.v/datos.p);
         lista[i]=datos;
     }
-    printf("leido\n\n");
-    for (int i = 0; i < salida.nFilas; i++){
-        printf("%f %f %f \n",lista[i].v,lista[i].p,lista[i].ponderacion); 
-    }
-     printf("\n\n"); 
     quicksort(lista,0,salida.nFilas);
-    for (int i = 0; i < salida.nFilas; i++){
-        printf("%f %f %f \n",lista[i].v,lista[i].p,lista[i].ponderacion); 
-    }
     
     salida.lista=lista;
     printf("\n");
